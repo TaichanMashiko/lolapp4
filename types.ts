@@ -60,3 +60,27 @@ export enum Importance {
   MEDIUM = 'Medium',
   LOW = 'Low'
 }
+
+// Japanese Translations
+export const ROLE_TRANSLATIONS: Record<string, string> = {
+  [Role.TOP]: 'トップ',
+  [Role.JUNGLE]: 'ジャングル',
+  [Role.MID]: 'ミッド',
+  [Role.ADC]: 'ADC',
+  [Role.SUPPORT]: 'サポート',
+  [Role.GENERAL]: '全般',
+};
+
+export const CATEGORY_TRANSLATIONS: Record<string, string> = {
+  [Category.LANING]: 'レーン戦',
+  [Category.TEAMFIGHT]: '集団戦',
+  [Category.VISION]: '視界',
+  [Category.MACRO]: 'マクロ',
+  [Category.MENTAL]: 'メンタル',
+};
+
+export const IMPORTANCE_TRANSLATIONS: Record<string, string> = {
+  [Importance.HIGH]: '高',
+  [Importance.MEDIUM]: '中',
+  [Importance.LOW]: '低',
+};

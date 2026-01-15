@@ -33,7 +33,7 @@ const App: React.FC = () => {
 
   const initAuth = async () => {
     if (!clientId) {
-      alert("Please provide a Google Client ID in Settings first.");
+      alert("設定画面でGoogle Client IDを入力してください。");
       setActiveTab('settings');
       return;
     }
@@ -53,7 +53,7 @@ const App: React.FC = () => {
       await handleLogin();
       setIsLoggedIn(true);
     } catch (e) {
-      alert("Login failed. Check console.");
+      alert("ログインに失敗しました。コンソールを確認してください。");
     }
   };
 
@@ -61,7 +61,7 @@ const App: React.FC = () => {
     localStorage.setItem('lol_tracker_sheet_id', spreadsheetId);
     localStorage.setItem('lol_tracker_client_id', clientId);
     localStorage.setItem('lol_tracker_gemini_key', geminiKey);
-    alert("Settings saved. Please refresh if you changed Client ID.");
+    alert("設定を保存しました。Client IDを変更した場合はページを更新してください。");
     initAuth();
   };
 
@@ -92,19 +92,19 @@ const App: React.FC = () => {
             active={activeTab === 'dashboard'} 
             onClick={() => setActiveTab('dashboard')} 
             icon={<LayoutDashboard />} 
-            label="Dashboard" 
+            label="ダッシュボード" 
           />
           <NavButton 
             active={activeTab === 'analyze'} 
             onClick={() => setActiveTab('analyze')} 
             icon={<PlayCircle />} 
-            label="Video Analyzer" 
+            label="動画解析" 
           />
           <NavButton 
             active={activeTab === 'review'} 
             onClick={() => setActiveTab('review')} 
             icon={<ClipboardList />} 
-            label="Match Review" 
+            label="試合の振り返り" 
           />
         </nav>
 
@@ -113,7 +113,7 @@ const App: React.FC = () => {
             active={activeTab === 'settings'} 
             onClick={() => setActiveTab('settings')} 
             icon={<Settings />} 
-            label="Settings" 
+            label="設定" 
           />
         </div>
       </aside>
@@ -124,22 +124,22 @@ const App: React.FC = () => {
           <div className="h-full flex flex-col items-center justify-center space-y-6">
             <div className="bg-slate-800 p-8 rounded-2xl border border-slate-700 shadow-2xl max-w-md w-full text-center">
               <Key className="w-12 h-12 text-cyan-500 mx-auto mb-4" />
-              <h2 className="text-2xl font-bold text-white mb-2">Authentication Required</h2>
-              <p className="text-slate-400 mb-6">Connect your Google Account to access your Knowledge Base and Match History stored in Google Sheets.</p>
+              <h2 className="text-2xl font-bold text-white mb-2">認証が必要です</h2>
+              <p className="text-slate-400 mb-6">Googleアカウントと連携して、スプレッドシートへのアクセスを許可してください。</p>
               
               {!isConfigured ? (
                  <button 
                  onClick={() => setActiveTab('settings')}
                  className="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 rounded-lg transition-colors"
                >
-                 Go to Settings
+                 設定画面へ移動
                </button>
               ) : (
                 <button 
                   onClick={login}
                   className="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 rounded-lg flex items-center justify-center gap-2 transition-colors"
                 >
-                  <LogIn className="w-5 h-5" /> Sign in with Google
+                  <LogIn className="w-5 h-5" /> Googleでログイン
                 </button>
               )}
             </div>
@@ -154,7 +154,7 @@ const App: React.FC = () => {
 
         {activeTab === 'settings' && (
           <div className="max-w-2xl mx-auto bg-slate-800 p-8 rounded-xl border border-slate-700">
-            <h2 className="text-2xl font-bold text-white mb-6">Application Settings</h2>
+            <h2 className="text-2xl font-bold text-white mb-6">アプリケーション設定</h2>
             
             <div className="space-y-6">
               <div>
@@ -166,7 +166,7 @@ const App: React.FC = () => {
                   className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-white"
                   placeholder="xxxx.apps.googleusercontent.com"
                 />
-                <p className="text-xs text-slate-500 mt-1">From Google Cloud Console. Must allow 'https://apis.google.com/js/api.js' origin.</p>
+                <p className="text-xs text-slate-500 mt-1">Google Cloud Consoleから取得。「https://apis.google.com/js/api.js」を許可済みオリジンに追加してください。</p>
               </div>
 
               <div>
@@ -177,19 +177,19 @@ const App: React.FC = () => {
                   onChange={(e) => setGeminiKey(e.target.value)}
                   className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-white"
                 />
-                 <p className="text-xs text-slate-500 mt-1">Paid key required for Search Grounding (Gemini 3 Pro).</p>
+                 <p className="text-xs text-slate-500 mt-1">Search Grounding (Gemini 3 Pro) を利用するための有料キーが必要です。</p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-1">Google Spreadsheet ID</label>
+                <label className="block text-sm font-medium text-slate-300 mb-1">スプレッドシート ID</label>
                 <input 
                   type="text" 
                   value={spreadsheetId}
                   onChange={(e) => setSpreadsheetId(e.target.value)}
                   className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-white"
-                  placeholder="The long ID in the sheet URL"
+                  placeholder="URLの中にある長いID"
                 />
-                <p className="text-xs text-slate-500 mt-1">Sheet must contain 'Knowledge_Base' and 'Match_History' tabs.</p>
+                <p className="text-xs text-slate-500 mt-1">シートには「Knowledge_Base」と「Match_History」という名前のタブが必要です。</p>
               </div>
 
               <div className="pt-4 flex gap-4">
@@ -197,14 +197,14 @@ const App: React.FC = () => {
                   onClick={saveSettings}
                   className="bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-6 rounded-lg"
                 >
-                  Save Configuration
+                  設定を保存
                 </button>
                 {clientId && (
                    <button 
                    onClick={initAuth}
                    className="bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2 px-6 rounded-lg"
                  >
-                   Initialize Auth
+                   認証を初期化
                  </button>
                 )}
               </div>

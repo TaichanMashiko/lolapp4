@@ -21,6 +21,7 @@ export const extractAdviceFromVideo = async (
     4. Determine the Champion if specific (or General).
     5. Categorize into: Laning, Teamfight, Vision, Macro, or Mental.
     6. Rate importance: High, Medium, Low.
+    7. **Crucial**: The 'content' of the advice MUST be in **Japanese**.
     
     Output JSON format only.
   `;
@@ -31,6 +32,7 @@ export const extractAdviceFromVideo = async (
     
     Extract actionable advice items.
     Return a JSON object with a key 'adviceList' containing an array of items.
+    Ensure the 'content' field is written in Japanese.
   `;
 
   try {
@@ -49,7 +51,7 @@ export const extractAdviceFromVideo = async (
               items: {
                 type: Type.OBJECT,
                 properties: {
-                  content: { type: Type.STRING, description: "The specific advice" },
+                  content: { type: Type.STRING, description: "The specific advice in Japanese" },
                   role_tags: { type: Type.STRING, description: "Comma separated roles, e.g. 'Mid, Top'" },
                   champion_tags: { type: Type.STRING, description: "Comma separated champs, e.g. 'Ahri' or 'General'" },
                   category: { type: Type.STRING, enum: ['Laning', 'Teamfight', 'Vision', 'Macro', 'Mental'] },

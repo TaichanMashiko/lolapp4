@@ -8,6 +8,7 @@ export const extractAdviceFromVideo = async (
 ): Promise<Partial<Advice>[]> => {
   if (!apiKey) throw new Error("API Key is missing");
 
+  // Initialize with the provided API key
   const ai = new GoogleGenAI({ apiKey });
 
   const systemInstruction = `
@@ -36,12 +37,14 @@ export const extractAdviceFromVideo = async (
   `;
 
   try {
+    // Use 'gemini-2.0-flash' which is generally available and performant.
     const response = await ai.models.generateContent({
-      model: "gemini-3-pro-preview", // Required for tool use
+      model: "gemini-2.0-flash", 
       contents: prompt,
       config: {
         systemInstruction: systemInstruction,
-        tools: [{ googleSearch: {} }], // Use search to "watch" the video content/metadata
+        // Google Search Grounding allows the model to "see" the video metadata/content via search.
+        tools: [{ googleSearch: {} }], 
         responseMimeType: "application/json",
         responseSchema: {
           type: Type.OBJECT,
@@ -70,8 +73,9 @@ export const extractAdviceFromVideo = async (
     const parsed = JSON.parse(text);
     return parsed.adviceList || [];
 
-  } catch (error) {
+  } catch (error: any) {
     console.error("Gemini Extraction Error:", error);
-    throw error;
+    // Re-throw with the raw message so the UI can parse it
+    throw new Error(error.message || JSON.stringify(error));
   }
 };

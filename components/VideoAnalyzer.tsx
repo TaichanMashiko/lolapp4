@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { extractAdviceFromVideo } from '../services/geminiService';
 import { appendAdvice } from '../services/sheetsService';
 import { Advice } from '../types';
-import { Loader2, Youtube, Save, CheckCircle } from 'lucide-react';
+import { Loader2, Youtube, Save, CheckCircle, AlertTriangle, ExternalLink } from 'lucide-react';
 import { CATEGORY_TRANSLATIONS, IMPORTANCE_TRANSLATIONS } from '../types';
 
 interface Props {
@@ -18,19 +18,41 @@ const VideoAnalyzer: React.FC<Props> = ({ apiKey, spreadsheetId }) => {
   const [extractedAdvice, setExtractedAdvice] = useState<Partial<Advice>[]>([]);
   const [videoTitle, setVideoTitle] = useState('解析結果');
   const [successMsg, setSuccessMsg] = useState('');
+  const [errorMsg, setErrorMsg] = useState<{title: string, detail: string, type: 'leak' | 'quota' | 'other'} | null>(null);
 
   const handleAnalyze = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsAnalyzing(true);
     setExtractedAdvice([]);
     setSuccessMsg('');
+    setErrorMsg(null);
 
     try {
       const results = await extractAdviceFromVideo(apiKey, url, notes);
       setExtractedAdvice(results);
       setVideoTitle(`動画解析 - ${new Date().toLocaleTimeString()}`);
-    } catch (error) {
-      alert("動画の解析に失敗しました。APIキーが有効か、モデルが利用可能かを確認してください。");
+    } catch (error: any) {
+      const msg = error.message || '';
+      
+      if (msg.includes('leaked') || msg.includes('403')) {
+        setErrorMsg({
+          title: 'APIキーが無効です（漏洩検知）',
+          detail: 'このAPIキーは漏洩した可能性があるため、Googleによりブロックされました。新しいキーを作成してください。',
+          type: 'leak'
+        });
+      } else if (msg.includes('Quota') || msg.includes('429') || msg.includes('limit: 0')) {
+        setErrorMsg({
+          title: '利用制限（クォータ）超過',
+          detail: 'APIの利用上限に達したか、このモデルを利用する権限がありません。しばらく待つか、Google Cloudの課金設定を確認してください。',
+          type: 'quota'
+        });
+      } else {
+        setErrorMsg({
+          title: '解析エラー',
+          detail: `予期せぬエラーが発生しました: ${msg.slice(0, 200)}...`,
+          type: 'other'
+        });
+      }
     } finally {
       setIsAnalyzing(false);
     }
@@ -73,6 +95,33 @@ const VideoAnalyzer: React.FC<Props> = ({ apiKey, spreadsheetId }) => {
           <Youtube className="w-6 h-6" />
           知識の抽出
         </h2>
+        
+        {/* Error Display */}
+        {errorMsg && (
+          <div className="mb-6 bg-red-900/30 border border-red-500 rounded-lg p-4 flex flex-col gap-2">
+            <div className="flex items-center gap-2 text-red-300 font-bold text-lg">
+              <AlertTriangle className="w-6 h-6" />
+              {errorMsg.title}
+            </div>
+            <p className="text-red-200 text-sm">{errorMsg.detail}</p>
+            {errorMsg.type === 'leak' && (
+               <a 
+                 href="https://aistudio.google.com/app/apikey" 
+                 target="_blank" 
+                 rel="noopener noreferrer"
+                 className="mt-2 inline-flex items-center gap-2 bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded text-sm font-bold w-fit transition-colors"
+               >
+                 <ExternalLink className="w-4 h-4" /> 新しいキーを作成 (Google AI Studio)
+               </a>
+            )}
+            {errorMsg.type === 'quota' && (
+               <div className="text-xs text-slate-400 mt-1">
+                 ※設定画面でAPIキーを変更するか、時間を空けて再試行してください。
+               </div>
+            )}
+          </div>
+        )}
+
         <form onSubmit={handleAnalyze} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-slate-300 mb-1">YouTube URL</label>

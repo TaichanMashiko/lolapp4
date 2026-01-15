@@ -38,15 +38,14 @@ export const extractAdviceFromVideo = async (
   `;
 
   try {
-    // Use 'gemini-2.5-flash' as requested.
-    // Note: We cannot use responseMimeType: 'application/json' together with googleSearch tool in this model version currently.
-    // We must rely on prompt engineering for JSON output.
+    // Use 'gemini-3-pro-preview' as requested.
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash", 
+      model: "gemini-3-pro-preview", 
       contents: prompt,
       config: {
         systemInstruction: systemInstruction,
         tools: [{ googleSearch: {} }], 
+        // We rely on prompt engineering for JSON output to avoid conflicts with tools + structured output modes
       },
     });
 

@@ -37,9 +37,9 @@ export const extractAdviceFromVideo = async (
   `;
 
   try {
-    // Use 'gemini-2.0-flash' which is generally available and performant.
+    // Use 'gemini-2.5-flash' as requested by the user.
     const response = await ai.models.generateContent({
-      model: "gemini-2.0-flash", 
+      model: "gemini-2.5-flash", 
       contents: prompt,
       config: {
         systemInstruction: systemInstruction,

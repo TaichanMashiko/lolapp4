@@ -177,7 +177,7 @@ const App: React.FC = () => {
                   onChange={(e) => setGeminiKey(e.target.value)}
                   className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-white"
                 />
-                 <p className="text-xs text-slate-500 mt-1">Search Grounding (Gemini 3 Pro) を利用するための有料キーが必要です。</p>
+                 <p className="text-xs text-slate-500 mt-1">Search Grounding を利用するための有料キーが必要です。(gemini-2.5-flash等のモデルを利用)</p>
               </div>
 
               <div>

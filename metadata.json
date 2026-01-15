@@ -1,0 +1,5 @@
+{
+  "name": "LoL Mindset Tracker",
+  "description": "A performance tracking app for League of Legends that correlates mindset achievement from coaching videos with actual match win rates.",
+  "requestFramePermissions": []
+}

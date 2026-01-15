@@ -1,4 +1,4 @@
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenAI } from "@google/genai";
 import { Advice } from "../types";
 
 export const extractAdviceFromVideo = async (
@@ -24,7 +24,8 @@ export const extractAdviceFromVideo = async (
     6. Rate importance: High, Medium, Low.
     7. **Crucial**: The 'content' of the advice MUST be in **Japanese**.
     
-    Output JSON format only.
+    Output strictly in valid JSON format.
+    Structure: { "adviceList": [ { "content": "...", "role_tags": "...", "champion_tags": "...", "category": "...", "importance": "..." } ] }
   `;
 
   const prompt = `
@@ -37,40 +38,26 @@ export const extractAdviceFromVideo = async (
   `;
 
   try {
-    // Use 'gemini-2.5-flash' as requested by the user.
+    // Use 'gemini-2.5-flash' as requested.
+    // Note: We cannot use responseMimeType: 'application/json' together with googleSearch tool in this model version currently.
+    // We must rely on prompt engineering for JSON output.
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash", 
       contents: prompt,
       config: {
         systemInstruction: systemInstruction,
-        // Google Search Grounding allows the model to "see" the video metadata/content via search.
         tools: [{ googleSearch: {} }], 
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            adviceList: {
-              type: Type.ARRAY,
-              items: {
-                type: Type.OBJECT,
-                properties: {
-                  content: { type: Type.STRING, description: "The specific advice in Japanese" },
-                  role_tags: { type: Type.STRING, description: "Comma separated roles, e.g. 'Mid, Top'" },
-                  champion_tags: { type: Type.STRING, description: "Comma separated champs, e.g. 'Ahri' or 'General'" },
-                  category: { type: Type.STRING, enum: ['Laning', 'Teamfight', 'Vision', 'Macro', 'Mental'] },
-                  importance: { type: Type.STRING, enum: ['High', 'Medium', 'Low'] },
-                }
-              }
-            }
-          }
-        }
       },
     });
 
     const text = response.text;
     if (!text) return [];
 
-    const parsed = JSON.parse(text);
+    // Helper to extract JSON if wrapped in markdown code blocks or contains extra text
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    const jsonStr = jsonMatch ? jsonMatch[0] : text;
+
+    const parsed = JSON.parse(jsonStr);
     return parsed.adviceList || [];
 
   } catch (error: any) {
